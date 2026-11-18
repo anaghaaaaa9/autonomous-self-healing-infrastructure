@@ -1,0 +1,22 @@
+# Docker-free mode: the orchestrator runs the app as a child process (dev / CI / quick demo).
+backend: local
+interval_seconds: 3
+db_path: data/incidents-local.db
+metrics_port: 9100
+thresholds:
+  cpu_ratio: 0.80
+  memory_ratio: 0.80
+consecutive_cycles:
+  container_crash: 1
+  high_cpu: 3
+  high_memory: 3
+  health_check_failure: 3
+policy:
+  max_attempts: 3
+  base_backoff_seconds: 6
+  verify_timeout_seconds: 30
+workloads:
+  - name: shl-app
+    url: http://localhost:8081
+    command: "{python} application/app.py"
+    env: {PORT: "8081", APP_MEMORY_LIMIT_MB: "128", APP_CPU_LIMIT: "0.5", MAX_CHAOS_MB: "100"}

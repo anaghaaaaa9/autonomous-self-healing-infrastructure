@@ -1,0 +1,11 @@
+---
+# Scale a deployment. Vars: namespace, deployment, replicas
+- name: Scale deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "kubectl scale deployment/{{ deployment }} --replicas={{ replicas }}"
+      ansible.builtin.command:
+        argv: [kubectl, -n, "{{ namespace }}", scale, "deployment/{{ deployment }}", "--replicas={{ replicas }}"]
+      changed_when: true

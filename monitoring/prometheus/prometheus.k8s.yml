@@ -1,0 +1,17 @@
+# Kind mode: the app Service is exposed on the host at NodePort 30080 (kind extraPortMappings).
+# Note: the Service load-balances, so `app_*` series here are aggregated across pods; per-pod series
+# come from the orchestrator (shl_instance_*), which observes each pod through the API-server proxy.
+global:
+  scrape_interval: 5s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: app
+    static_configs:
+      - targets: ["host.docker.internal:30080"]
+  - job_name: orchestrator
+    static_configs:
+      - targets: ["host.docker.internal:9100"]
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

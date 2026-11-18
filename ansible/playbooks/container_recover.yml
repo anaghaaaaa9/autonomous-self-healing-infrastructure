@@ -1,0 +1,22 @@
+---
+# Recover a Docker container. Vars: container (required), container_action: start|restart
+- name: Recover container
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    container_action: restart
+  tasks:
+    - name: "docker {{ container_action }} {{ container }}"
+      ansible.builtin.command:
+        argv: "{{ ['docker', container_action] + (['-t', '10'] if container_action == 'restart' else []) + [container] }}"
+      changed_when: true
+
+    - name: Confirm the container is running
+      ansible.builtin.command:
+        argv: [docker, inspect, "--format={% raw %}{{.State.Running}}{% endraw %}", "{{ container }}"]
+      register: running
+      changed_when: false
+      until: running.stdout == 'true'
+      retries: 10
+      delay: 1

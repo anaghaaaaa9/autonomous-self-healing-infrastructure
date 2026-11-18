@@ -1,0 +1,11 @@
+---
+# Rolling restart. Vars: namespace, deployment
+- name: Restart deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "kubectl rollout restart deployment/{{ deployment }}"
+      ansible.builtin.command:
+        argv: [kubectl, -n, "{{ namespace }}", rollout, restart, "deployment/{{ deployment }}"]
+      changed_when: true

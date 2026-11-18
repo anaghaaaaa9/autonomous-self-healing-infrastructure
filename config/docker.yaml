@@ -1,0 +1,25 @@
+# Orchestrator config for the Docker Compose stack (default).
+backend: docker
+executor: native            # set to "ansible" to route remediation through ansible/playbooks
+interval_seconds: 5
+db_path: data/incidents.db
+metrics_port: 9100
+thresholds:
+  cpu_ratio: 0.80           # ratio of the container CPU limit (0.5 core)
+  memory_ratio: 0.85        # ratio of the container memory limit (192 MB)
+consecutive_cycles:         # cycles (x interval) a condition must persist before an incident opens
+  container_crash: 1
+  high_cpu: 3
+  high_memory: 3
+  health_check_failure: 3
+policy:
+  max_attempts: 3
+  base_backoff_seconds: 10
+  backoff_factor: 2
+  max_backoff_seconds: 120
+  max_remediations_per_hour: 6
+  verify_timeout_seconds: 45
+workloads:
+  - name: shl-app
+    container: shl-app
+    url: http://localhost:8081

@@ -1,0 +1,36 @@
+# Orchestrator config for the Kind cluster. Uses kubectl + API-server pod proxy.
+backend: kubernetes
+executor: native
+interval_seconds: 5
+db_path: data/incidents-k8s.db
+metrics_port: 9100
+# kube_context: kind-shl
+thresholds:
+  cpu_ratio: 0.80
+  memory_ratio: 0.85
+consecutive_cycles:
+  container_crash: 1
+  pod_failure: 2
+  high_cpu: 3
+  high_memory: 3
+  health_check_failure: 3
+grace_cycles:               # let kubelet / ReplicaSet self-heal first; we verify instead of claiming credit
+  container_crash: 2
+  pod_failure: 2
+policy:
+  max_attempts: 3
+  base_backoff_seconds: 10
+  backoff_factor: 2
+  max_backoff_seconds: 120
+  max_remediations_per_hour: 6
+  verify_timeout_seconds: 60
+scale:
+  max_replicas: 3
+  scale_in_after_seconds: 120
+workloads:
+  - name: shl-app
+    namespace: shl
+    deployment: shl-app
+    selector: app=shl-app
+    port: 8080
+    replicas: 2             # baseline replica count used for scale-in

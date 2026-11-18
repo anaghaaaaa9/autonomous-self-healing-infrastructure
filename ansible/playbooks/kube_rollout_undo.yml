@@ -1,0 +1,11 @@
+---
+# Roll back to the previous ReplicaSet (e.g. after a bad image). Vars: namespace, deployment
+- name: Roll back deployment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "kubectl rollout undo deployment/{{ deployment }}"
+      ansible.builtin.command:
+        argv: [kubectl, -n, "{{ namespace }}", rollout, undo, "deployment/{{ deployment }}"]
+      changed_when: true

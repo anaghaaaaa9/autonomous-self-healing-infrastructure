@@ -1,0 +1,11 @@
+---
+# Replace a failed pod (its ReplicaSet creates a new one). Vars: namespace, pod
+- name: Delete pod
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "kubectl delete pod {{ pod }}"
+      ansible.builtin.command:
+        argv: [kubectl, -n, "{{ namespace }}", delete, pod, "{{ pod }}", "--wait=false"]
+      changed_when: true

@@ -1,0 +1,8 @@
+# Single-node Kind cluster (lightest option for an 8 GB laptop).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: shl
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - {containerPort: 30080, hostPort: 30080, protocol: TCP}   # Service NodePort -> host (Prometheus scrape)

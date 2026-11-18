@@ -1,0 +1,43 @@
+# Least-privilege identity for the orchestrator. Used when it runs in-cluster; on the host it uses
+# your kubeconfig. Mirrors exactly the verbs the orchestrator calls (see remediation/backends.py).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shl-orchestrator
+  namespace: shl
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: shl-orchestrator
+  namespace: shl
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]            # observe + replace failed pods
+  - apiGroups: [""]
+    resources: ["pods/proxy"]
+    verbs: ["get"]                              # per-pod /health and /metrics probes
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch"]             # rollout restart / undo
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "update", "patch"]           # scale out / in
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list"]                      # rollout undo reads revision history
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: shl-orchestrator
+  namespace: shl
+subjects:
+  - kind: ServiceAccount
+    name: shl-orchestrator
+    namespace: shl
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: shl-orchestrator
